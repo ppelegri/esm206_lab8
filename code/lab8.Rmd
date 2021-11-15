@@ -135,4 +135,6 @@ homes_predicted <- augment(homes_lm1)
 view(homes_predicted)
 ```
 
-Use the `predict()` function to try out your model
+Use the `predict()` function to try out your model on new scenarios that you creae.
+
+# MY UPDATE!!!!!
