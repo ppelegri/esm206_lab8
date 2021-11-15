@@ -66,3 +66,73 @@ ggplot(homes_sub, aes(x = SqFt, y = Price)) +
   geom_smooth(method = lm)
 ```
 
+## Model the relationship with home price as the dependent variable (DV)
+
+```{r}
+homes_lm1 <- lm(Price ~ City + Bedrooms + Bathrooms + SqFt + PricePerSqFt + Status, data = homes_sub)
+
+# Make a subset that only contains the quantitative variables
+homes_quant <- homes_sub %>% 
+  select(Price:PricePerSqFt)
+
+# Find correlations between variables in your data frame
+homes_cor <- cor(homes_quant)
+homes_cor
+
+corrplot(homes_cor, method = "ellipse")
+
+homes_lm1_tidy <- tidy(homes_lm1)
+homes_lm1_tidy
+
+plot(homes_lm1)
+```
+
+Try another model where we simplify this a bit:
+
+- City
+- SqFt
+- Status
+
+```{r}
+homes_lm2 <- lm(Price ~ City + SqFt + Status, homes_sub)
+
+homes_lm2_tidy <- tidy(homes_lm2)
+homes_lm2_tidy
+
+plot(homes_lm2)
+
+homes_lm1_glance <- glance(homes_lm1)
+homes_lm2_glance <- glance(homes_lm2)
+
+AIC(homes_lm1)
+AIC(homes_lm2)
+```
+
+A third model
+```{r}
+homes_lm3 <- lm(Price ~ City + SqFt + Bedrooms + Status, homes_sub)
+
+homes_lm3_tidy <- tidy(homes_lm3)
+homes_lm3_tidy
+
+homes_lm3_glance <- glance(homes_lm3)
+homes_lm3_glance
+
+AIC(homes_lm3)
+
+summary(homes_lm3)
+
+modelsummary(list(homes_lm1, homes_lm2, homes_lm3))
+```
+
+Now star making predictions with this model
+
+Use broom::augment()
+
+```{r}
+homes_predicted <- augment(homes_lm1)
+
+view(homes_predicted)
+```
+
+Use the `predict()` function to try out your model
