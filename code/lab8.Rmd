@@ -1,0 +1,68 @@
+---
+title: "Lab 8"
+author: "Patrick Pelegri-O'Day"
+date: "11/15/2021"
+output: html_document
+---
+
+```{r setup, include=TRUE, message = FALSE, warning = FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+
+# Atach packages
+library(tidyverse)
+library(corrplot)
+library(stargazer)
+library(broom)
+library(modelsummary)
+library(here)
+```
+
+## Read in data
+```{r}
+homes <-
+  read_csv(here("data", "slo_homes.csv"))
+```
+
+A litle bit of cleaning:
+
+Make a subset called homes_sub that only contains observations (rows) where the city is:
+
+- San Luis Obispo
+- Arroyo Grande
+- Atascadero
+- Santa Maria-Orcutt
+```{r}
+homes_sub <- homes %>% 
+  filter(City %in% c("San Luis Obispo", "Arroyo Grande", "Atascadero", "Santa Maria-Orcutt"))
+```
+
+## Explore data
+
+Summary statistics (home price, based on city and sale status):
+
+- Find and return in a nice summary table the mean and standard deviation of home price, grouped by city and sale status
+```{r, include = FALSE, eval = TRUE}
+homes_summary <- homes_sub %>% 
+  group_by(City, Status) %>% 
+  summarize(price_mean = mean(Price, na.rm = TRUE),
+            price_sd = sd(Price, na.rm = TRUE))
+
+homes_summary
+
+# Actually I don't even want to run this code: set eval = FALSE
+```
+
+Data visualization
+```{r}
+ggplot(homes_sub, aes(x = Price)) +
+  geom_density(aes(color = City, fill = City), alpha = 0.2) + 
+  scale_x_continuous(limits = c(0, 3e6))
+```
+
+Explore the relationship (visual data exploration) between square footage and home price
+```{r}
+ggplot(homes_sub, aes(x = SqFt, y = Price)) + 
+  geom_point(aes(color = City, fill = City, shape = Status)) +
+  geom_smooth(method = lm)
+```
+
